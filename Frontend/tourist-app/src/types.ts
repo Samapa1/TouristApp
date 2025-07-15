@@ -26,3 +26,13 @@ export interface Restaurant {
     cuisine?: string,
     website?: string
 }
+
+export interface Option {
+    value: string, 
+    label: string
+}
+
+export interface ratingOption {
+    value: string, 
+    label: string
+}

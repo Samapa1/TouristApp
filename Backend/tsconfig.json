@@ -6,6 +6,8 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    // "lib": ["ES2022"],
+    // "module": "ES2022",
 
     "noImplicitAny": true,
     "esModuleInterop": true,
