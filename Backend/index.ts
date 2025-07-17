@@ -8,6 +8,7 @@ import mongoose from 'mongoose';
 
 import { formatWeatherData, formatRestaurantData, formatSupermarketData, formatMuseumData } from './utils.ts';
 import { Rating } from './models/rating.ts';
+import { checkIp } from './utils.ts';
 
 const apiKeyWeather = process.env.API_key_weather
 const APIKeyGeo = process.env.API_key_geo
@@ -20,10 +21,12 @@ mongoose.connect(url)
   .then( () => {
     console.log('Connected to MongoDB')
   })
-  .catch((error) => {
+  .catch((error: unknown) => {
+    let errorMessage = 'Connecting to MongoDB failed'
     if (error instanceof Error) {
-    console.log('Connecting to MongoDB failed', error.message)
+      errorMessage += error.message
     }
+    console.log(errorMessage)
   })
 
 
@@ -34,6 +37,8 @@ app.use(express.json())
 app.get('/', async (req, res) => {
 
   try {
+    // console.log(req.connection.remoteAddress)
+    console.log(req.ip)
     let cityp = req.query.city;
     let activities = req.query.activities;
     const coordinates = await axios.get(`http://api.openweathermap.org/geo/1.0/direct?q=${cityp}&appid=${apiKeyWeather}`);
@@ -45,9 +50,8 @@ app.get('/', async (req, res) => {
     const ratings = await Rating.find({ city: cityp })
     if (ratings.length > 0) {
       ratings.forEach(r => ratingSum += r.rating)
-      ratingAverage = ratingSum / ratings.length
+      ratingAverage = (ratingSum / ratings.length).toFixed(2)
     }
-    console.log(ratings)
 
     if (activities === "supermarkets") {
       const supermarkets = await axios.get(`https://api.geoapify.com/v2/places?categories=commercial.supermarket&filter=circle:${coordinates.data[0].lon},${coordinates.data[0].lat},5000&bias=proximity:${coordinates.data[0].lon},${coordinates.data[0].lat}&limit=20&apiKey=${APIKeyGeo}`)
@@ -88,21 +92,28 @@ app.get('/', async (req, res) => {
 
 app.post('/', async(req, res) => {
   try {
-    console.log(req.body)
+    const ipData = await checkIp({ip: req.ip, city: req.body.city})
+    console.log("result of ipCheck")
+    console.log(ipData)
     const rating = new Rating({
       city: req.body.city, 
-      rating: req.body.rating
+      rating: req.body.rating,
+      ipAddress: req.ip,
+      date: new Date()
     }) 
     const result = await rating.save()
     res.send({
       city: result.city,
       rating: result.rating
     })
-  } catch(error) {
+  } catch(error: unknown) {
     if (error instanceof Error) {
       console.log(error.message)
-      res.status(400).send({error: 'something went wrong'})
+      if (error.name === "ValidationError")
+        res.status(400).send({error: error.message})
+      
     }
+    res.status(400).send({error: 'something went wrong'})
   }
 })
 

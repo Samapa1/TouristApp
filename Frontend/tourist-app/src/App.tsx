@@ -77,14 +77,12 @@ function App() {
   const handleRating = async (event: React.SyntheticEvent) => {
     event.preventDefault();
     if (newRating) {
-    console.log(newRating)
     const data = {
       "city": city,
       "rating": Number(newRating.value)
     }
     await axios.post('http://localhost:3003/', data)
     const response = await axios.get(`http://localhost:3003/?city=${city}`)
-    setWeather(response.data.weather)
     setRating(response.data.rating)
     }
   }
@@ -96,7 +94,7 @@ function App() {
         <p>Weather: {weather.description}</p>
         <p>Temperature: {(weather.temperature - 273.15).toFixed(1)} &deg;C</p>
         <img src = {`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}></img>
-        {rating ? <p>City rating: {rating} </p> : null}
+        {rating ? <p>City rating: {rating} </p> : <p>City rating: N/A</p>}
         <Select<ratingOption>
           value={newRating}
           onChange={(ratingvalue) => setNewRating(ratingvalue)}

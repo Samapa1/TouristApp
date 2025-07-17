@@ -1,19 +1,4 @@
 import mongoose from 'mongoose';
-// require("dotenv").config();
-
-// const url = `${process.env.MONGODB_URI}`
-
-// mongoose.set('strictQuery', false)
-
-// mongoose.connect(url)
-//   .then( () => {
-//     console.log('Connected to MongoDB')
-//   })
-//   .catch((error) => {
-//     if (error instanceof Error) {
-//     console.log('Connecting to MongoDB failed', error.message)
-//     }
-//   })
 
 const ratingSchema = new mongoose.Schema({
     city: {
@@ -23,6 +8,16 @@ const ratingSchema = new mongoose.Schema({
     },
     rating: {
       type: Number, 
+      min: 1,
+      max: 10,
+      required: true
+    },
+    ipAddress: {
+      type: String,
+      required: true, 
+    }, 
+    date: {
+      type: Date, 
       required: true
     }
 })
