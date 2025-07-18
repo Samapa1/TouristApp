@@ -1,6 +1,6 @@
-POST http://localhost:3003/?city=Helsinki
+POST http://localhost:3003/
 Content-Type: application/json
 
-{"city": "Helsinki",
-#  "rating": 8
+{"city": "Suomussalmi",
+ "rating": 7
 }

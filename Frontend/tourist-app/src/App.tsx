@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Select from 'react-select';
 import axios from 'axios';
+import { AxiosError } from 'axios';
 import type { Weather, Supermarket, Museum, Restaurant, Option, ratingOption } from './types';
 
 function App() {
@@ -76,6 +77,8 @@ function App() {
 
   const handleRating = async (event: React.SyntheticEvent) => {
     event.preventDefault();
+
+    try {
     if (newRating) {
     const data = {
       "city": city,
@@ -84,6 +87,13 @@ function App() {
     await axios.post('http://localhost:3003/', data)
     const response = await axios.get(`http://localhost:3003/?city=${city}`)
     setRating(response.data.rating)
+    }
+    } catch (exception) {
+      if (exception instanceof AxiosError) {
+        console.log(exception.response?.data.error)
+      } else {
+        console.log(exception)
+      }
     }
   }
 

@@ -7,6 +7,7 @@ import { ZodError } from 'zod';
 import mongoose from 'mongoose';
 
 import { formatWeatherData, formatRestaurantData, formatSupermarketData, formatMuseumData } from './utils.ts';
+import { toRatingData } from './types.ts';
 import { Rating } from './models/rating.ts';
 import { checkIp } from './utils.ts';
 
@@ -37,7 +38,6 @@ app.use(express.json())
 app.get('/', async (req, res) => {
 
   try {
-    // console.log(req.connection.remoteAddress)
     console.log(req.ip)
     let cityp = req.query.city;
     let activities = req.query.activities;
@@ -93,26 +93,32 @@ app.get('/', async (req, res) => {
 app.post('/', async(req, res) => {
   try {
     const ipData = await checkIp({ip: req.ip, city: req.body.city})
-    console.log("result of ipCheck")
-    console.log(ipData)
-    const rating = new Rating({
-      city: req.body.city, 
-      rating: req.body.rating,
-      ipAddress: req.ip,
-      date: new Date()
-    }) 
-    const result = await rating.save()
-    res.send({
-      city: result.city,
-      rating: result.rating
+    if (ipData === true) {
+      res.status(400).send({error: 'You can rate a city only once a day.'})
+    }
+    else {
+      const validatedRating = toRatingData({
+        city: req.body.city, 
+        rating: req.body.rating,
+        ipAddress: req.ip,
+        date: new Date()
     })
+      const rating = new Rating(validatedRating) 
+      const result = await rating.save()
+      res.send({
+        city: result.city,
+        rating: result.rating
+      })
+    }
   } catch(error: unknown) {
     if (error instanceof Error) {
       console.log(error.message)
-      if (error.name === "ValidationError")
+      if (error.name === "ValidationError") {
         res.status(400).send({error: error.message})
-      
+      } else if (error instanceof ZodError) {
+      res.status(400).send({error: error.issues})
     }
+    } 
     res.status(400).send({error: 'something went wrong'})
   }
 })

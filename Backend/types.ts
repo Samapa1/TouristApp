@@ -110,3 +110,16 @@ export interface Museum {
     openingHours?: string
 }
 
+export const Rating  = z.object ({
+    city: z.string(),
+    rating: z.number().min(1).max(10),
+    ipAddress: z.string(),
+    date: z.date()
+
+})
+
+export type RatingData = z.infer<typeof Rating>
+
+export const toRatingData = (data: unknown): RatingData => {
+    return Rating.parse(data)
+}
