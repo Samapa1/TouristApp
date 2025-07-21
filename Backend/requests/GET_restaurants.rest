@@ -1,1 +1,1 @@
-GET  http://localhost:3003/?city=helsinki&activities=restaurants
+GET http://localhost:3003/activities/?city=helsinki&activity=restaurants

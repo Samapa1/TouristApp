@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import Select from 'react-select';
 import axios from 'axios';
-import { AxiosError } from 'axios';
 import type { Weather, Supermarket, Museum, Restaurant, Option, ratingOption } from './types';
+import ShowCityData from './components/ShowCityData';
 
 function App() {
   const [city, setCity] = useState('')
+  const [cityToShow, setCityToShow] = useState('')
   const [activity, setActivity] = useState<Option | null>(null);
   const [supermarkets, setSupermarkets] = useState<Supermarket[]>([])
   const [museums, setMuseums] = useState<Museum[]>([])
@@ -17,24 +18,13 @@ function App() {
   })
   const [rating, setRating] = useState(null);
   const [newRating, setNewRating] = useState<ratingOption | null>(null);
+  console.log(newRating)
+  const baseUrl = 'http://localhost:3003/' 
 
   const options: Array<Option> = [
     { value: 'museums', label: 'museums'},
     { value: 'restaurants', label: 'restaurants'},
     { value: 'supermarkets', label: 'supermarkets'},
-  ]
-
-    const ratingvalues: Array<ratingOption> = [
-    { value: '1', label: '1'},
-    { value: '2', label: '2'},
-    { value: '3', label: '3'},
-    { value: '4', label: '4'},
-    { value: '5', label: '5'},
-    { value: '6', label: '6'},
-    { value: '7', label: '7'},
-    { value: '8', label: '8'},
-    { value: '9', label: '9'},
-    { value: '10', label: '10'},
   ]
 
   const chooseCity = (e: React.ChangeEvent) => {
@@ -43,76 +33,40 @@ function App() {
     setMuseums([])
     setRestaurants([])
     setSupermarkets([])
+    setNewRating(null)
   }
 
   const handleSubmit = async (event: React.SyntheticEvent) => {
     event.preventDefault();
-    const response = await axios.get(`http://localhost:3003/?city=${city}`)
-    setWeather(response.data.weather)
-    setRating(response.data.rating)
+    const weatherResponse = await axios.get(baseUrl + `weather/?city=${city}`)
+    setWeather(weatherResponse.data.weather)
+    const ratingResponse = await axios.get(`http://localhost:3003/rating/?city=${city}`)
+    setRating(ratingResponse.data.rating)
+    setCityToShow(city)
   }
 
   const handleActivity = async (event: React.SyntheticEvent) => {
     event.preventDefault();
-    console.log(activity)
     if (activity) {
-    const response = await axios.get(`http://localhost:3003/?city=${city}&activities=${activity.value}`)
-    if (response.data.supermarkets) {
-      setSupermarkets(response.data.supermarkets)
-      setMuseums([])
-      setRestaurants([])
-    }
-    else if (response.data.museums) {
-      setMuseums(response.data.museums)
-      setSupermarkets([])
-      setRestaurants([])
-    }
-    else if (response.data.restaurants) {
-      setRestaurants(response.data.restaurants)
-      setSupermarkets([])
-      setMuseums([])
-    }
-    }
-  }
-
-  const handleRating = async (event: React.SyntheticEvent) => {
-    event.preventDefault();
-
-    try {
-    if (newRating) {
-    const data = {
-      "city": city,
-      "rating": Number(newRating.value)
-    }
-    await axios.post('http://localhost:3003/', data)
-    const response = await axios.get(`http://localhost:3003/?city=${city}`)
-    setRating(response.data.rating)
-    }
-    } catch (exception) {
-      if (exception instanceof AxiosError) {
-        console.log(exception.response?.data.error)
-      } else {
-        console.log(exception)
+      console.log(activity)
+      const response = await axios.get(`http://localhost:3003/activities/?city=${city}&activity=${activity.value}`)
+      console.log(response.data)
+      if (response.data.supermarkets) {
+        setSupermarkets(response.data.supermarkets)
+        setMuseums([])
+        setRestaurants([])
+      }
+      else if (response.data.museums) {
+        setMuseums(response.data.museums)
+        setSupermarkets([])
+        setRestaurants([])
+      }
+      else if (response.data.restaurants) {
+        setRestaurants(response.data.restaurants)
+        setSupermarkets([])
+        setMuseums([])
       }
     }
-  }
-
-  const showWeather = () => {
-    return (
-      <div>
-        <h2>{city}</h2>
-        <p>Weather: {weather.description}</p>
-        <p>Temperature: {(weather.temperature - 273.15).toFixed(1)} &deg;C</p>
-        <img src = {`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}></img>
-        {rating ? <p>City rating: {rating} </p> : <p>City rating: N/A</p>}
-        <Select<ratingOption>
-          value={newRating}
-          onChange={(ratingvalue) => setNewRating(ratingvalue)}
-          options={ratingvalues}
-        />
-        <button onClick={handleRating}>Rate</button>
-      </div>
-    )
   }
 
     const showWActivities = () => {
@@ -160,7 +114,14 @@ function App() {
         <button type="submit">find</button>
       </form>
       <br/>
-      {weather.description ? showWeather() : null}
+      {weather.description ? <ShowCityData 
+        city={city}
+        cityToShow={cityToShow}
+        weather={weather}
+        rating={rating}
+        setRating={setRating}
+      /> 
+      : null}
       {weather.description ? showWActivities() : null}
     </>
   )

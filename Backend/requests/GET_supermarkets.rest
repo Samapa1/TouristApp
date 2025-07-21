@@ -1,1 +1,1 @@
-GET http://localhost:3003/?city=tampere&activities=supermarkets
+GET http://localhost:3003/activities/?city=helsinki&activity=supermarkets

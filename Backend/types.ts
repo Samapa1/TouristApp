@@ -123,3 +123,8 @@ export type RatingData = z.infer<typeof Rating>
 export const toRatingData = (data: unknown): RatingData => {
     return Rating.parse(data)
 }
+
+export interface ipData {
+    ip?: string,
+    city: string 
+}

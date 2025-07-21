@@ -1,4 +1,4 @@
-import { toRestaurantData, toWeatherData, toSupermarketData, toMuseumData, Weather, Restaurant, Supermarket, Museum } from "./types"
+import { toRestaurantData, toWeatherData, toSupermarketData, toMuseumData, Weather, Restaurant, Supermarket, Museum, ipData } from "./types"
 import { Rating } from "./models/rating"
 
 export const formatWeatherData = (data: any): Weather => {
@@ -51,20 +51,20 @@ export const formatMuseumData = (data: any): Museum[] => {
 
 }
 
-export const checkIp = async (data: any): Promise<boolean> => {
+export const checkIp = async (data: ipData): Promise<boolean> => {
     const isFound =  await Rating.find({ ipAddress: data.ip, city: data.city })
     const ratingDates = isFound.map(r => r.date)
     const timeLimits = ratingDates.map(d => d.setDate(d.getDate()+1))
     const now = (new Date).getTime()
     const results = timeLimits.map(t => { if (now  < t) {
-        return true
+            return true
         } else {
             return false 
-            }
+        }
     })
 
     if (results.includes(true)) {
-    return true
+        return true
     } 
     else {
         return false
