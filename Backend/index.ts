@@ -44,6 +44,9 @@ app.get('/weather', async (req, res) => {
       res.status(404).send({error: 'city not found'})
     }
     const weather = await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${coordinates.data[0].lat}&lon=${coordinates.data[0].lon}&appid=${apiKeyWeather}`);
+    if (!weather.data) {
+      res.status(404).send({error: 'weather data not found'})
+    }
     const formattedWeather = formatWeatherData(weather.data)
     res.send({weather: formattedWeather})
   }
@@ -92,6 +95,7 @@ app.get('/activities', async (req, res) => {
 
     if (activity === "supermarkets") {
       const supermarkets = await axios.get(`https://api.geoapify.com/v2/places?categories=commercial.supermarket&filter=circle:${coordinates.data[0].lon},${coordinates.data[0].lat},5000&bias=proximity:${coordinates.data[0].lon},${coordinates.data[0].lat}&limit=20&apiKey=${APIKeyGeo}`)
+      console.log(supermarkets.data)
       const formattedSupermarkets = formatSupermarketData(supermarkets.data)
       res.send({supermarkets: formattedSupermarkets})
     

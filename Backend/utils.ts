@@ -1,4 +1,4 @@
-import { toRestaurantData, toWeatherData, toSupermarketData, toMuseumData, Weather, Restaurant, Supermarket, Museum, ipData } from "./types"
+import { toRestaurantRawData, toWeatherData, toSupermarketRawData, toMuseumRawData, Weather, Restaurant, RestaurantData, Supermarket, SupermarketData, Museum, MuseumData, ipData } from "./types"
 import { Rating } from "./models/rating"
 
 export const formatWeatherData = (data: any): Weather => {
@@ -12,8 +12,12 @@ export const formatWeatherData = (data: any): Weather => {
 }
 
 export const formatRestaurantData = (data: any): Restaurant[] => {
-    const validatedData = toRestaurantData(data)
-    return validatedData.features.map((restaurant) => {
+    const validatedData = toRestaurantRawData(data)
+    function checkData(data: RestaurantData | any): data is RestaurantData{
+        return (data.properties.name !== undefined && data.properties.address_line2 !== undefined)
+    }
+    const filteredData = validatedData.features.filter(checkData)
+    return filteredData.map((restaurant: RestaurantData) => {
         return ({
             name: restaurant.properties.name, 
             id: restaurant.properties.place_id, 
@@ -25,8 +29,16 @@ export const formatRestaurantData = (data: any): Restaurant[] => {
 }
 
 export const formatSupermarketData = (data: any): Supermarket[] => {
-    const validatedData = toSupermarketData(data)
-    return (validatedData.features.map((supermarket) => {
+    const validatedData = toSupermarketRawData(data)
+
+    function checkData(data: SupermarketData | any): data is SupermarketData{
+        return (data.properties.name !== undefined && data.properties.address_line2 !== undefined)
+    }  
+
+    const filteredData = validatedData.features.filter(checkData)
+    // console.log(filteredData)
+
+    return (filteredData.map((supermarket: SupermarketData) => {
         return ({
             name: supermarket.properties.name, 
             id: supermarket.properties.place_id,
@@ -35,12 +47,18 @@ export const formatSupermarketData = (data: any): Supermarket[] => {
             openingHours: supermarket.properties.opening_hours
         });
     }));
-
 }
 
 export const formatMuseumData = (data: any): Museum[] => {
-    const validatedData = toMuseumData(data)
-    return (validatedData.features.map((museum) => {
+    const validatedData = toMuseumRawData(data)
+
+    function checkData(data: MuseumData | any ): data is MuseumData{
+        return (data.properties.name !== undefined && data.properties.address_line2 !== undefined)
+    }
+
+    const filteredData = validatedData.features.filter(checkData)
+
+    return (filteredData.map((museum: MuseumData) => {
         return ({
             name: museum.properties.name, 
             id: museum.properties.place_id,

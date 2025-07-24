@@ -23,12 +23,12 @@ export interface Weather {
     icon: string
 } 
 
-export const restaurantData = z.object({
+export const restaurantRawData = z.object({
     features: 
         z.array(z.object({
             properties: (z.object({
-                name: z.string(),
-                address_line2: z.string(),
+                name: z.string().optional(),
+                address_line2: z.string().optional(),
                 website: z.string().optional(),
                 place_id: z.string(),
                 datasource: (z.object({
@@ -41,10 +41,24 @@ export const restaurantData = z.object({
     })).min(1)
 })
 
-export type RestaurantData = z.infer<typeof restaurantData>
+export type RestaurantRawData = z.infer<typeof restaurantRawData>
 
-export const toRestaurantData = (data: unknown): RestaurantData => {
-    return restaurantData.parse(data)
+export const toRestaurantRawData = (data: unknown): RestaurantRawData => {
+    return restaurantRawData.parse(data)
+}
+
+export type RestaurantData = {
+    properties: {
+        name: string,
+        address_line2: string,
+        website?: string,
+        place_id: string,
+        datasource: {
+                    raw: {
+                        cuisine?: string
+                    }
+        }
+    }
 }
 
 
@@ -56,13 +70,13 @@ export interface Restaurant {
     website?: string
 }
 
-export const supermarketData = z.object({
+export const supermarketRawData = z.object({
     features: 
         z.array(z.object({
             properties: (z.object({
-                name: z.string(),
-                suburb: z.string(),
-                address_line2: z.string(),
+                name: z.string().optional(),
+                suburb: z.string().optional(),
+                address_line2: z.string().optional(),
                 place_id: z.string(),
                 opening_hours: z.string().optional()
         }))
@@ -70,26 +84,36 @@ export const supermarketData = z.object({
     })).min(1)
 })
 
-export type SupermarketData = z.infer<typeof supermarketData>
+export type SupermarketRawData = z.infer<typeof supermarketRawData>
 
-export const toSupermarketData = (data: unknown): SupermarketData => {
-    return supermarketData.parse(data)
+export const toSupermarketRawData = (data: unknown): SupermarketRawData => {
+    return supermarketRawData.parse(data)
+}
+
+export type SupermarketData = {
+    properties: {
+        name: string,
+        suburb?: string,
+        address_line2: string,
+        place_id: string,
+        opening_hours?: string
+    }      
 }
 
 export interface Supermarket {
     name: string, 
     id: string,
-    suburb: string, 
+    suburb?: string, 
     address: string,
     openingHours?: string
 }
 
-export const museumData = z.object({
+export const museumRawData = z.object({
     features: 
         z.array(z.object({
             properties: (z.object({
-                name: z.string(),
-                address_line2: z.string(),
+                name: z.string().optional(),
+                address_line2: z.string().optional(),
                 place_id: z.string(),
                 opening_hours: z.string().optional()
         }))
@@ -97,10 +121,19 @@ export const museumData = z.object({
     })).min(1)
 })
 
-export type MuseumData = z.infer<typeof museumData>
+export type MuseumRawData = z.infer<typeof museumRawData>
 
-export const toMuseumData = (data: unknown): MuseumData => {
-    return museumData.parse(data)
+export const toMuseumRawData = (data: unknown): MuseumRawData => {
+    return museumRawData.parse(data)
+}
+
+export type MuseumData = {
+    properties: {
+        name: string, 
+        place_id: string,
+        address_line2: string,
+        opening_hours?: string
+    }
 }
 
 export interface Museum {
