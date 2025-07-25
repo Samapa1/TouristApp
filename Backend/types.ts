@@ -61,7 +61,6 @@ export type RestaurantData = {
     }
 }
 
-
 export interface Restaurant {
     name: string, 
     id: string, 
@@ -142,6 +141,11 @@ export interface Museum {
     address: string,
     openingHours?: string
 }
+
+export type ActivityData = MuseumData | SupermarketData | RestaurantData
+export type ActivityRawData = MuseumRawData | SupermarketRawData | RestaurantRawData
+
+// export type Activity = Museum | Supermarket | Restaurant
 
 export const Rating  = z.object ({
     city: z.string(),
