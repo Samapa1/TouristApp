@@ -1,15 +1,17 @@
 import axios from 'axios';
 import { AxiosError } from 'axios';
-import { useState } from 'react';
 import Select from 'react-select';
+import { useState } from 'react';
 import type { Weather, ratingOption } from "../types"
 
 interface Props {
   cityToShow : string
   city: string,
   weather: Weather
-  rating: ratingOption | null
+  rating: number | null
   setRating: React.Dispatch<React.SetStateAction<ratingOption>> | React.Dispatch<React.SetStateAction<null>>
+  newRating: ratingOption 
+  setNewRating: React.Dispatch<React.SetStateAction<ratingOption>> 
 }
 
 const ratingvalues: Array<ratingOption> = [
@@ -25,11 +27,9 @@ const ratingvalues: Array<ratingOption> = [
     { value: '10', label: '10'},
   ]
 
-const ShowCityData = ( {city, cityToShow, weather, rating, setRating }: Props) => {
-    const [newRating, setNewRating] = useState<ratingOption | null>(null);
-
-    console.log(rating)
-
+const ShowCityData = ( {city, cityToShow, weather, rating, setRating, newRating, setNewRating }: Props) => {
+  const [notification, setNotification] = useState('')
+ 
     const handleRating = async (event: React.SyntheticEvent) => {
       event.preventDefault();
 
@@ -46,6 +46,8 @@ const ShowCityData = ( {city, cityToShow, weather, rating, setRating }: Props) =
       } catch (exception) {
         if (exception instanceof AxiosError) {
           console.log(exception.response?.data.error)
+          setNotification(exception.response?.data.error)
+          setTimeout(() => setNotification(''), 5000)
         } else {
           console.log(exception)
         }
@@ -54,14 +56,15 @@ const ShowCityData = ( {city, cityToShow, weather, rating, setRating }: Props) =
 
     return (
       <div>
+        {notification}
         <h2>{cityToShow}</h2>
         <p>Weather: {weather.description}</p>
         <p>Temperature: {(weather.temperature - 273.15).toFixed(1)} &deg;C</p>
         <img src = {`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}></img>
-        {rating ? <p>City rating: {rating.value} </p> : <p>City rating: N/A</p>}
+        {rating ? <p>City rating: {rating} </p> : <p>City rating: N/A</p>}
         <Select<ratingOption>
           value={newRating}
-          onChange={(ratingvalue) => setNewRating(ratingvalue)}
+          onChange={(ratingvalue) => setNewRating(ratingvalue ? ratingvalue : {value: '', label: ''})}
           options={ratingvalues}
         />
         <button onClick={handleRating}>Rate</button>

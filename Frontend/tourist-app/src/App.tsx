@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Select from 'react-select';
 import axios from 'axios';
-import type { Weather, Supermarket, Museum, Restaurant, Option, ratingOption } from './types';
+import type { Weather, Supermarket, Museum, Restaurant, Option, ratingOption} from './types';
 import ShowCityData from './components/ShowCityData';
 
 function App() {
@@ -17,8 +17,7 @@ function App() {
     icon: ''
   })
   const [rating, setRating] = useState(null);
-  const [newRating, setNewRating] = useState<ratingOption | null>(null);
-  console.log(newRating)
+  const [newRating, setNewRating] = useState<ratingOption>({value: '', label: ''});
   const baseUrl = 'http://localhost:3003/' 
 
   const options: Array<Option> = [
@@ -33,14 +32,14 @@ function App() {
     setMuseums([])
     setRestaurants([])
     setSupermarkets([])
-    setNewRating(null)
+    setNewRating({value: '', label: ''})
   }
 
   const handleSubmit = async (event: React.SyntheticEvent) => {
     event.preventDefault();
     const weatherResponse = await axios.get(baseUrl + `weather/?city=${city}`)
     setWeather(weatherResponse.data.weather)
-    const ratingResponse = await axios.get(`http://localhost:3003/rating/?city=${city}`)
+    const ratingResponse = await axios.get(baseUrl + `rating/?city=${city}`)
     setRating(ratingResponse.data.rating)
     setCityToShow(city)
   }
@@ -49,7 +48,7 @@ function App() {
     event.preventDefault();
     if (activity) {
       console.log(activity)
-      const response = await axios.get(`http://localhost:3003/activities/?city=${city}&activity=${activity.value}`)
+      const response = await axios.get(baseUrl + `activities/?city=${city}&activity=${activity.value}`)
       console.log(response.data)
       if (response.data.supermarkets) {
         setSupermarkets(response.data.supermarkets)
@@ -120,6 +119,8 @@ function App() {
         weather={weather}
         rating={rating}
         setRating={setRating}
+        newRating={newRating}
+        setNewRating={setNewRating}
       /> 
       : null}
       {weather.description ? showWActivities() : null}
