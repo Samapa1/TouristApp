@@ -23,6 +23,12 @@ export interface Weather {
     icon: string
 } 
 
+interface BaseActivity {
+    name: string, 
+    id: string, 
+    address: string,
+
+}
 export const restaurantRawData = z.object({
     features: 
         z.array(z.object({
@@ -61,12 +67,10 @@ export type RestaurantData = {
     }
 }
 
-export interface Restaurant {
-    name: string, 
-    id: string, 
-    address: string,
+export interface Restaurant extends BaseActivity {
     cuisine?: string, 
-    website?: string
+    website?: string,
+    type: "restaurant"
 }
 
 export const supermarketRawData = z.object({
@@ -99,12 +103,10 @@ export type SupermarketData = {
     }      
 }
 
-export interface Supermarket {
-    name: string, 
-    id: string,
+export interface Supermarket extends BaseActivity {
     suburb?: string, 
-    address: string,
-    openingHours?: string
+    openingHours?: string,
+    type: "supermarket"
 }
 
 export const museumRawData = z.object({
@@ -135,15 +137,46 @@ export type MuseumData = {
     }
 }
 
-export interface Museum {
-    name: string, 
-    id: string,
-    address: string,
-    openingHours?: string
+export interface Museum extends BaseActivity {
+    openingHours?: string,
+    type: "museum"
 }
 
-export type ActivityData = MuseumData | SupermarketData | RestaurantData
-export type ActivityRawData = MuseumRawData | SupermarketRawData | RestaurantRawData
+export interface Park extends BaseActivity {
+    suburb?: string,
+    type: "park"
+}
+
+export const ParkRawData = z.object({
+    features: 
+        z.array(z.object({
+            properties: (z.object({
+                name: z.string().optional(),
+                suburb: z.string().optional(),
+                address_line2: z.string().optional(),
+                place_id: z.string(),
+        }))
+               
+    })).min(1)
+})
+
+export type ParkRawData = z.infer<typeof ParkRawData>
+
+export const toParkRawData = (data: unknown): ParkRawData => {
+    return ParkRawData.parse(data)
+}
+
+export type ParkData = {
+    properties: {
+        name: string, 
+        suburb?: string
+        place_id: string,
+        address_line2: string
+    }
+}
+
+export type ActivityData = MuseumData | SupermarketData | RestaurantData | ParkData
+export type ActivityRawData = MuseumRawData | SupermarketRawData | RestaurantRawData | ParkRawData
 
 // export type Activity = Museum | Supermarket | Restaurant
 

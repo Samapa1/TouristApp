@@ -1,4 +1,4 @@
-import { toRestaurantRawData, toWeatherData, toSupermarketRawData, toMuseumRawData, Weather, Restaurant, ActivityData, ActivityRawData,RestaurantData, Supermarket, SupermarketData, Museum, MuseumData, ipData } from "./types"
+import { toRestaurantRawData, toWeatherData, toSupermarketRawData, toMuseumRawData, Weather, Restaurant, ActivityData, ActivityRawData,RestaurantData, Supermarket, SupermarketData, Museum, MuseumData, Park, toParkRawData, ParkData, ipData } from "./types"
 import { Rating } from "./models/rating"
 
 export const formatWeatherData = (data: unknown): Weather => {
@@ -25,7 +25,8 @@ export const formatRestaurantData = (data: unknown): Restaurant[] => {
             id: restaurant.properties.place_id, 
             address: restaurant.properties.address_line2,
             cuisine: restaurant.properties.datasource.raw.cuisine, 
-            website: restaurant.properties.website
+            website: restaurant.properties.website,
+            type: "restaurant"
         });
     });
 }
@@ -40,7 +41,8 @@ export const formatSupermarketData = (data: unknown): Supermarket[] => {
             id: supermarket.properties.place_id,
             suburb: supermarket.properties.suburb, 
             address: supermarket.properties.address_line2,
-            openingHours: supermarket.properties.opening_hours
+            openingHours: supermarket.properties.opening_hours,
+            type: "supermarket"
         });
     }));
 }
@@ -54,10 +56,25 @@ export const formatMuseumData = (data: unknown): Museum[] => {
             name: museum.properties.name, 
             id: museum.properties.place_id,
             address: museum.properties.address_line2,
-            openingHours: museum.properties.opening_hours
+            openingHours: museum.properties.opening_hours,
+            type: "museum"
         });
     }));
 
+}
+
+export const formatParkData = (data: unknown): Park[] => {
+    const validatedData = toParkRawData(data)
+    const filteredData = validatedData.features.filter(checkData)
+    return (filteredData.map((park: ParkData) => {
+        return {
+            name: park.properties.name, 
+            id: park.properties.place_id, 
+            suburb: park.properties.suburb,
+            address: park.properties.address_line2, 
+            type: "park"
+        }
+    }))
 }
 
 export const checkIp = async (data: ipData): Promise<boolean> => {

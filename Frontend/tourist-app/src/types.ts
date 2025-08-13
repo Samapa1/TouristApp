@@ -4,28 +4,34 @@ export interface Weather {
     icon: string
 } 
 
-export interface Supermarket {
+export interface ActivityBase {
     name: string, 
     id: string,
+    address: string
+}
+
+export interface Supermarket extends ActivityBase {
     suburb: string, 
-    address: string,
-    openingHours: string
+    openingHours: string,
+    type: "supermarket"
 }
 
-export interface Museum {
-    name: string, 
-    id: string,
-    address: string,
+export interface Museum extends ActivityBase {
     openingHours?: string
+    type: "museum"
 }
 
-export interface Restaurant {
-    name: string, 
-    id: string,
-    address: string,
+export interface Restaurant extends ActivityBase {
     cuisine?: string,
-    website?: string
+    website?: string,
+    type: "restaurant"
 }
+
+export interface Park extends ActivityBase {
+    suburb?: string, 
+    type: "park"
+}
+
 
 export interface Option {
     value: string, 
@@ -36,3 +42,5 @@ export interface ratingOption {
     value: string, 
     label: string
 }
+
+export type Activity = Restaurant | Museum | Supermarket | Park

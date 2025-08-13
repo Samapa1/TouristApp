@@ -6,7 +6,7 @@ import cors from 'cors';
 import { ZodError } from 'zod';
 import mongoose from 'mongoose';
 
-import { formatWeatherData, formatRestaurantData, formatSupermarketData, formatMuseumData } from './utils.ts';
+import { formatWeatherData, formatRestaurantData, formatSupermarketData, formatMuseumData, formatParkData } from './utils.ts';
 import { toRatingData } from './types.ts';
 import { Rating } from './models/rating.ts';
 import { checkIp } from './utils.ts';
@@ -97,22 +97,28 @@ app.get('/activities', async (req, res) => {
       const supermarkets = await axios.get(`https://api.geoapify.com/v2/places?categories=commercial.supermarket&filter=circle:${coordinates.data[0].lon},${coordinates.data[0].lat},5000&bias=proximity:${coordinates.data[0].lon},${coordinates.data[0].lat}&limit=20&apiKey=${APIKeyGeo}`)
       console.log(supermarkets.data)
       const formattedSupermarkets = formatSupermarketData(supermarkets.data)
-      res.send({supermarkets: formattedSupermarkets})
+      res.send({activities: formattedSupermarkets})
     
     }
 
     else if (activity === "museums") {
       const museums = await axios.get(`https://api.geoapify.com/v2/places?categories=entertainment.museum&filter=circle:${coordinates.data[0].lon},${coordinates.data[0].lat},5000&bias=proximity:${coordinates.data[0].lon},${coordinates.data[0].lat}&limit=20&apiKey=${APIKeyGeo}`)
       const formattedMuseums = formatMuseumData(museums.data)
-      res.send({museums: formattedMuseums})
+      res.send({activities: formattedMuseums})
     }
 
     else if (activity === "restaurants") {
       const restaurants = await axios.get(`https://api.geoapify.com/v2/places?categories=catering.restaurant&filter=circle:${coordinates.data[0].lon},${coordinates.data[0].lat},5000&bias=proximity:${coordinates.data[0].lon},${coordinates.data[0].lat}&limit=20&apiKey=${APIKeyGeo}`)
       const formattedRestaurants = formatRestaurantData(restaurants.data)
-      res.send({restaurants: formattedRestaurants})
+      res.send({activities: formattedRestaurants})
     }
 
+    else if (activity === "parks") {
+      const parks = await axios.get(`https://api.geoapify.com/v2/places?categories=leisure.park&&filter=circle:${coordinates.data[0].lon},${coordinates.data[0].lat},5000&bias=proximity:${coordinates.data[0].lon},${coordinates.data[0].lat}&limit=20&apiKey=${APIKeyGeo}`)
+      const formattedParks = formatParkData(parks.data)
+      res.send({activities: formattedParks})
+    }
+    
     else {
       res.status(404).send({error: 'activity not found'})
     }
