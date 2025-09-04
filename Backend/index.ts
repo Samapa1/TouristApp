@@ -115,6 +115,7 @@ app.get('/activities', async (req, res) => {
 
     else if (activity === "parks") {
       const parks = await axios.get(`https://api.geoapify.com/v2/places?categories=leisure.park&&filter=circle:${coordinates.data[0].lon},${coordinates.data[0].lat},5000&bias=proximity:${coordinates.data[0].lon},${coordinates.data[0].lat}&limit=20&apiKey=${APIKeyGeo}`)
+      console.log(parks)
       const formattedParks = formatParkData(parks.data)
       res.send({activities: formattedParks})
     }
