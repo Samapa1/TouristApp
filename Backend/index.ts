@@ -42,20 +42,25 @@ app.get('/weather', async (req, res) => {
     const coordinates = await axios.get(`http://api.openweathermap.org/geo/1.0/direct?q=${cityp}&appid=${apiKeyWeather}`);
     if (!coordinates.data[0]) {
       res.status(404).send({error: 'city not found'})
+      return
     }
     const weather = await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${coordinates.data[0].lat}&lon=${coordinates.data[0].lon}&appid=${apiKeyWeather}`);
     if (!weather.data) {
       res.status(404).send({error: 'weather data not found'})
+      return
     }
     const formattedWeather = formatWeatherData(weather.data)
     res.send({weather: formattedWeather})
+    return
   }
 
   catch (error: unknown) {
     if (error instanceof ZodError) {
       res.status(400).send({error: error.issues})
+      return 
     } else {
       res.status(400).send({error: 'unknown error'})
+      return
     }
   }
 

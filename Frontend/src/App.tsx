@@ -59,7 +59,7 @@ function App() {
       )}
       <Form onSubmit={handleSubmit}>
         <Form.Group>
-          <Form.Label className='mt-3'>Choose a city:</Form.Label>
+          <Form.Label className='mt-3'>Enter a city:</Form.Label>
           <Form.Control type="text" value={city} onChange={chooseCity}/>
         </Form.Group>
         <Button className='mt-1' type="submit">Find</Button>
