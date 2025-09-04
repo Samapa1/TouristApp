@@ -1,6 +1,7 @@
     import Select from 'react-select';
     import React, { useState } from 'react';
     import axios from 'axios';
+    import { Button } from 'react-bootstrap';
 
     import type { Option, Activity } from '../types';
 
@@ -32,12 +33,15 @@
     const showName = (activity: Activity) => {
       if (activity.type === "supermarket" || activity.type === "park" ) {
         return (
-          activity.suburb ? <h4>{activity.name} {activity.suburb}</h4> : <h4>{activity.name}</h4>
-
+          <div className='my-3'>
+            {activity.suburb ? <h5>{activity.name} {activity.suburb}</h5> : <h5>{activity.name}</h5>}
+          </div>
         )
       } else {
         return (
-          <h4>{activity.name}</h4>
+          <div className='my-3'>
+            <h5>{activity.name}</h5>
+          </div>
         )
       }
     }
@@ -67,22 +71,20 @@
     }
 
     return (
-      <div>
-        <h2>Find nearby</h2>
+      <div className="mt-4">
+        <h4>Find nearby</h4>
         <Select<Option>
           value={activity}
           onChange={(option) => setActivity(option)}
           options={options}
         />
-        <button onClick={handleActivity}>Find</button>
+        <Button className='my-1' onClick={handleActivity}>Find</Button>
         {activities ? activities.map(a => {return (
-          <div key= {a.id}>
+          <div className="my-4" key= {a.id}>
             {showName(a)}
             <p>{a.address}</p>
             {showDetails(a)}
           </div>
-
-
         )}) 
         : null}
       </div>

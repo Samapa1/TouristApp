@@ -80,6 +80,7 @@ app.get('/rating', async (req, res) => {
     if (error instanceof ZodError) {
       res.status(400).send({error: error.issues})
     } else {
+      console.log(error)
       res.status(400).send({error: 'unknown error'})
     }
   }

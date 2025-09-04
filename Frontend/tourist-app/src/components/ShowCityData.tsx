@@ -3,6 +3,7 @@ import { AxiosError } from 'axios';
 import Select from 'react-select';
 import { useState } from 'react';
 import type { Weather, ratingOption } from "../types"
+import { Button, Alert } from 'react-bootstrap';
 
 interface Props {
   cityToShow : string
@@ -34,7 +35,7 @@ const ShowCityData = ( {city, cityToShow, weather, rating, setRating, newRating,
       event.preventDefault();
 
       try {
-        if (newRating) {
+        if (newRating && Number(newRating.value) >0) {
           const data = {
             "city": city,
             "rating": Number(newRating.value)
@@ -55,19 +56,30 @@ const ShowCityData = ( {city, cityToShow, weather, rating, setRating, newRating,
   }
 
     return (
-      <div>
-        {notification}
+      <div className="mt-4">
         <h2>{cityToShow}</h2>
-        <p>Weather: {weather.description}</p>
-        <p>Temperature: {(weather.temperature - 273.15).toFixed(1)} &deg;C</p>
-        <img src = {`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}></img>
-        {rating ? <p>City rating: {rating} </p> : <p>City rating: N/A</p>}
-        <Select<ratingOption>
-          value={newRating}
-          onChange={(ratingvalue) => setNewRating(ratingvalue ? ratingvalue : {value: '', label: ''})}
-          options={ratingvalues}
-        />
-        <button onClick={handleRating}>Rate</button>
+        {(
+          notification &&
+          <Alert variant="danger">
+            {notification}
+          </Alert>
+        ) }
+        <div className="d-flex flex-row mt-4">
+          <div>
+            <p>Weather: {weather.description}</p>
+            <p>Temperature: {(weather.temperature - 273.15).toFixed(1)} &deg;C</p>
+            <img src = {`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}></img>
+          </div>
+          <div className="ps-5">
+          {rating ? <p>City rating: {rating} </p> : <p>City rating: N/A</p>}
+          <Select<ratingOption>
+            value={newRating}
+            onChange={(ratingvalue) => setNewRating(ratingvalue ? ratingvalue : {value: '', label: ''})}
+            options={ratingvalues}
+          />
+          <Button className='mt-1' onClick={handleRating}>Rate</Button>
+          </div>
+        </div>
       </div>
     )
 }
