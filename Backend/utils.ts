@@ -97,17 +97,3 @@ export const checkIp = async (data: ipData): Promise<boolean> => {
     return false
   }
 }
-
-// export const checkReqBody = (data: unknown): boolean => {
-//   if (!data || typeof data === 'undefined') {
-//     return false
-//   }
-//   if (data && typeof data === 'object') {
-//     if ('city' in data && 'rating' in data) {
-//       if (typeof data.city === 'string' && typeof data.rating === 'number') {
-//         return true
-//       }
-//     }
-//   }
-//   return false
-// }

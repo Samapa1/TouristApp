@@ -3,6 +3,9 @@
 The project demonstrates tourist app, where users can find things to do (museums, restaurants etc.) in chosen locations. 
 Users can also rate the cities. 
 
+Used programming languages, frameworks and technologies: 
+TypeScript, React, Node.js and MongoDB.
+
 ## Instructions: 
 
 Node JS and MongoDB are needed. The app makes calls to two external APIs, GeoApify and OpenWeather, that require API keys. 

@@ -10,7 +10,6 @@ import mongoose from 'mongoose'
 import { formatWeatherData, formatRestaurantData, formatSupermarketData, formatMuseumData, formatParkData } from './utils.ts'
 import { toRatingData, toCoordinateData } from './types.ts'
 import { Rating } from './models/rating.ts'
-// import { checkIp, checkReqBody } from './utils.ts'
 import { checkIp } from './utils.ts'
 
 const apiKeyWeather = process.env.API_key_weather
@@ -39,11 +38,34 @@ app.use(express.json())
 app.get('/weather', async (req, res) => {
   try {
     const cityp = req.query.city
+    if (!cityp) {
+      res.status(400).send({ error: 'please enter the city' })
+      return
+    }
     const cityparam = JSON.stringify(cityp)
-    const coordinates = await axios.get(`http://api.openweathermap.org/geo/1.0/direct?q=${cityparam}&appid=${apiKeyWeather}`)
+    const coordinates = await axios.get('http://api.openweathermap.org/geo/1.0/direct', { 
+      params: { 
+        q: cityparam, 
+        appid: apiKeyWeather
+      }
+    })
+   
+    if (coordinates.data.length <1) {
+      res.status(404).send({ error: 'city not found' })
+      return
+    }
+
     const validatedCoordinates = toCoordinateData(coordinates.data)
 
-    const weather = await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${validatedCoordinates[0].lat}&lon=${validatedCoordinates[0].lon}&appid=${apiKeyWeather}`)
+    const weather = await axios.get('https://api.openweathermap.org/data/2.5/weather', { 
+      params: { 
+        lat: validatedCoordinates[0].lat, 
+        lon: validatedCoordinates[0].lon,
+        appid: apiKeyWeather
+      }
+    })
+
+
     if (!weather.data) {
       res.status(404).send({ error: 'weather data not found' })
       return
@@ -95,33 +117,43 @@ app.get('/activities', async (req, res) => {
     const cityp = req.query.city
     const cityparam = JSON.stringify(cityp)
     const activity = req.query.activity
-    const coordinates = await axios.get(`http://api.openweathermap.org/geo/1.0/direct?q=${cityparam}&appid=${apiKeyWeather}`)
+    const coordinates = await axios.get('http://api.openweathermap.org/geo/1.0/direct', { 
+      params: { 
+        q: cityparam, 
+        appid: apiKeyWeather
+      }
+    })
     const validatedCoordinates = toCoordinateData(coordinates.data)
 
-    if (activity === 'supermarkets') {
-      const supermarkets = await axios.get(`https://api.geoapify.com/v2/places?categories=commercial.supermarket&filter=circle:${validatedCoordinates[0].lon},${validatedCoordinates[0].lat},5000&bias=proximity:${validatedCoordinates[0].lon},${validatedCoordinates[0].lat}&limit=20&apiKey=${APIKeyGeo}`)
-      console.log(supermarkets.data)
-      const formattedSupermarkets = formatSupermarketData(supermarkets.data)
-      res.send({ activities: formattedSupermarkets })
+    const getActivityData = async ( category: string, formatFunction: typeof formatRestaurantData | typeof formatSupermarketData | typeof formatMuseumData | typeof formatParkData  ) => {
+      const activityData = await axios.get('https://api.geoapify.com/v2/places', { 
+        params: { 
+          categories: category, 
+          filter: `circle:${validatedCoordinates[0].lon},${validatedCoordinates[0].lat},5000`,
+          bias: `proximity:${validatedCoordinates[0].lon},${validatedCoordinates[0].lat}`,
+          limit: `20`,
+          apiKey: `${APIKeyGeo}`
+        }
+      })
+      const formattedData = formatFunction(activityData.data)
+      res.send({ activities: formattedData })
+    }
+
+    if (activity === 'supermarkets') { 
+      getActivityData('commercial.supermarket', formatSupermarketData )
+
     }
 
     else if (activity === 'museums') {
-      const museums = await axios.get(`https://api.geoapify.com/v2/places?categories=entertainment.museum&filter=circle:${validatedCoordinates[0].lon},${validatedCoordinates[0].lat},5000&bias=proximity:${validatedCoordinates[0].lon},${validatedCoordinates[0].lat}&limit=20&apiKey=${APIKeyGeo}`)
-      const formattedMuseums = formatMuseumData(museums.data)
-      res.send({ activities: formattedMuseums })
+      getActivityData('entertainment.museum', formatMuseumData)
     }
 
     else if (activity === 'restaurants') {
-      const restaurants = await axios.get(`https://api.geoapify.com/v2/places?categories=catering.restaurant&filter=circle:${validatedCoordinates[0].lon},${validatedCoordinates[0].lat},5000&bias=proximity:${validatedCoordinates[0].lon},${validatedCoordinates[0].lat}&limit=20&apiKey=${APIKeyGeo}`)
-      const formattedRestaurants = formatRestaurantData(restaurants.data)
-      res.send({ activities: formattedRestaurants })
+      getActivityData('catering.restaurant', formatRestaurantData)
     }
 
     else if (activity === 'parks') {
-      const parks = await axios.get(`https://api.geoapify.com/v2/places?categories=leisure.park&&filter=circle:${validatedCoordinates[0].lon},${validatedCoordinates[0].lat},5000&bias=proximity:${validatedCoordinates[0].lon},${validatedCoordinates[0].lat}&limit=20&apiKey=${APIKeyGeo}`)
-      console.log(parks)
-      const formattedParks = formatParkData(parks.data)
-      res.send({ activities: formattedParks })
+      getActivityData('leisure.park', formatParkData)
     }
 
     else {

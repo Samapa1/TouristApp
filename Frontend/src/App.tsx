@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import axios from 'axios'
-import type { Weather, ratingOption, Activity } from './types'
-import ShowCityData from './components/ShowCityData'
-import ShowWActivities from './components/ShowActivities'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { Button, Form, Alert } from 'react-bootstrap'
 import { AxiosError } from 'axios'
+
+import type { Weather, ratingOption, Activity } from './types'
+import ShowCityData from './components/ShowCityData'
+import ShowWActivities from './components/ShowActivities'
+
 
 function App() {
   const [city, setCity] = useState('')
@@ -19,7 +21,7 @@ function App() {
   const [rating, setRating] = useState(null)
   const [newRating, setNewRating] = useState<ratingOption>({ value: '', label: '' })
   const [notification, setNotification] = useState('')
-  const baseUrl = 'http://localhost:3003/'
+  const baseUrl = import.meta.env.VITE_BASEURL
 
   const chooseCity = (e: React.ChangeEvent) => {
     const inputTarget = e.target as HTMLInputElement

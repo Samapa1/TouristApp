@@ -30,6 +30,7 @@ const ratingvalues: Array<ratingOption> = [
 
 const ShowCityData = ({ city, cityToShow, weather, rating, setRating, newRating, setNewRating }: Props) => {
   const [notification, setNotification] = useState('')
+  const baseUrl = import.meta.env.VITE_BASEURL
 
   const handleRating = async (event: React.SyntheticEvent) => {
     event.preventDefault()
@@ -40,8 +41,8 @@ const ShowCityData = ({ city, cityToShow, weather, rating, setRating, newRating,
           city: city,
           rating: Number(newRating.value),
         }
-        await axios.post('http://localhost:3003/rating', data)
-        const response = await axios.get(`http://localhost:3003/rating/?city=${city}`)
+        await axios.post(baseUrl + `rating`, data)
+        const response = await axios.get(baseUrl + `rating/?city=${city}`)
         setRating(response.data.rating)
       }
     }

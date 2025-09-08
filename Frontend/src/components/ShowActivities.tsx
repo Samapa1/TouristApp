@@ -13,7 +13,7 @@ interface Props {
 
 const ShowWActivities = ({ city, activities, setActivities }: Props) => {
   const [activity, setActivity] = useState<Option | null>(null)
-  const baseUrl = 'http://localhost:3003/'
+  const baseUrl = import.meta.env.VITE_BASEURL
 
   const options: Array<Option> = [
     { value: 'museums', label: 'museums' },
